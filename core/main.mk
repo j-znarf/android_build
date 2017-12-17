@@ -255,7 +255,23 @@ endif
 # These are the modifier targets that don't do anything themselves, but
 # change the behavior of the build.
 # (must be defined before including definitions.make)
-INTERNAL_MODIFIER_TARGETS := showcommands all
+INTERNAL_MODIFIER_TARGETS := showcommands all incrementaljavac
+
+.PHONY: incrementaljavac
+incrementaljavac: ;
+
+# WARNING:
+# ENABLE_INCREMENTALJAVAC should NOT be enabled by default, because change of
+# a Java source file won't trigger rebuild of its dependent Java files.
+# You can only enable it by adding "incrementaljavac" to your make command line.
+# You are responsible for the correctness of the incremental build.
+# This may decrease incremental build time dramatically for large Java libraries,
+# such as core.jar, framework.jar, etc.
+ENABLE_INCREMENTALJAVAC :=
+ifneq (,$(filter incrementaljavac, $(MAKECMDGOALS)))
+ENABLE_INCREMENTALJAVAC := true
+MAKECMDGOALS := $(filter-out incrementaljavac, $(MAKECMDGOALS))
+endif
 
 # EMMA_INSTRUMENT_STATIC merges the static emma library to each emma-enabled module.
 ifeq (true,$(EMMA_INSTRUMENT_STATIC))
@@ -301,22 +317,6 @@ TARGET_BUILD_JAVA_SUPPORT_LEVEL := platform
 # -----------------------------------------------------------------
 # The pdk (Platform Development Kit) build
 include build/core/pdk_config.mk
-
-#
-# -----------------------------------------------------------------
-# Jack version configuration
--include $(TOPDIR)prebuilts/sdk/tools/jack_versions.mk
--include $(TOPDIR)prebuilts/sdk/tools/jack_for_module.mk
-
-#
-# -----------------------------------------------------------------
-# Install and start Jack server
--include $(TOPDIR)prebuilts/sdk/tools/jack_server_setup.mk
-
-#
-# -----------------------------------------------------------------
-# Jacoco package name for Jack
--include $(TOPDIR)external/jacoco/config.mk
 
 #
 # -----------------------------------------------------------------

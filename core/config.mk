@@ -113,7 +113,7 @@ BUILD_DROIDDOC:= $(BUILD_SYSTEM)/droiddoc.mk
 BUILD_COPY_HEADERS := $(BUILD_SYSTEM)/copy_headers.mk
 BUILD_NATIVE_TEST := $(BUILD_SYSTEM)/native_test.mk
 BUILD_NATIVE_BENCHMARK := $(BUILD_SYSTEM)/native_benchmark.mk
-BUILD_HOST_NATIVE_TEST := $(BUILD_SYSTEM)/host_native_test.mk
+#BUILD_HOST_NATIVE_TEST := $(BUILD_SYSTEM)/host_native_test.mk
 BUILD_FUZZ_TEST := $(BUILD_SYSTEM)/fuzz_test.mk
 BUILD_HOST_FUZZ_TEST := $(BUILD_SYSTEM)/host_fuzz_test.mk
 
@@ -490,7 +490,9 @@ SIGNAPK_JNI_LIBRARY_PATH := $(HOST_OUT_SHARED_LIBRARIES)
 LLVM_RS_CC := $(HOST_OUT_EXECUTABLES)/llvm-rs-cc
 BCC_COMPAT := $(HOST_OUT_EXECUTABLES)/bcc_compat
 
-DX := $(HOST_OUT_EXECUTABLES)/dx
+#DX := $(HOST_OUT_EXECUTABLES)/dx
+DX := build/atool/dx
+DESUGAR := build/atool/desugar.jar
 MAINDEXCLASSES := $(HOST_OUT_EXECUTABLES)/mainDexClasses
 
 USE_PREBUILT_SDK_TOOLS_IN_PLACE := true
@@ -522,12 +524,11 @@ endif # TARGET_BUILD_APPS || TARGET_BUILD_PDK
 
 # ---------------------------------------------------------------
 # Generic tools.
-JACK := $(HOST_OUT_EXECUTABLES)/jack
 
 ifeq ($(USE_HOST_LEX),yes)
 LEX := flex
 else
-LEX := prebuilts/misc/$(BUILD_OS)-$(HOST_PREBUILT_ARCH)/flex/flex-2.5.39
+LEX := build/atool/flex/flex
 endif
 # The default PKGDATADIR built in the prebuilt bison is a relative path
 # external/bison/data.
@@ -537,7 +538,7 @@ BISON_PKGDATADIR := $(PWD)/external/bison/data
 ifeq ($(USE_HOST_BISON),yes)
 BISON := $(HOST_OUT_EXECUTABLES)/bison
 else
-BISON := prebuilts/misc/$(BUILD_OS)-$(HOST_PREBUILT_ARCH)/bison/bison
+BISON := build/atool/bison/bison
 endif
 YACC := $(BISON) -d
 
@@ -581,18 +582,7 @@ E2FSCK := $(HOST_OUT_EXECUTABLES)/e2fsck$(HOST_EXECUTABLE_SUFFIX)
 JARJAR := $(HOST_OUT_JAVA_LIBRARIES)/jarjar.jar
 DATA_BINDING_COMPILER := $(HOST_OUT_JAVA_LIBRARIES)/databinding-compiler.jar
 
-ifeq ($(ANDROID_COMPILE_WITH_JACK),true)
-DEFAULT_JACK_ENABLED:=full
-else
 DEFAULT_JACK_ENABLED:=
-endif
-ifneq ($(ANDROID_JACK_EXTRA_ARGS),)
-DEFAULT_JACK_EXTRA_ARGS := $(ANDROID_JACK_EXTRA_ARGS)
-else
-DEFAULT_JACK_EXTRA_ARGS := @$(BUILD_SYSTEM)/jack-default.args
-endif
-# Turn off jack warnings by default.
-DEFAULT_JACK_EXTRA_ARGS += --verbose error
 
 PROGUARD := external/proguard/bin/proguard.sh
 JAVATAGS := build/tools/java-event-log-tags.py
